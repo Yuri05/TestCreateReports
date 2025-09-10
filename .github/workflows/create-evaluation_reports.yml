@@ -86,11 +86,7 @@ jobs:
         git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
         git fetch origin main
         git rebase -Xours origin/main
-        if git rev-parse HEAD^ >/dev/null 2>&1; then
-          git reset HEAD^
-        else
-          echo "No parent commit for HEAD. Skipping reset."
-        fi
+        git reset HEAD^
         [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
         git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
         git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
@@ -102,13 +98,7 @@ jobs:
       with:
         tools-path: tools.csv
 
-    - name: Downgrade ggplot2 to 3.5.2
-      run: |
-        Rscript -e 'remove.packages("ggplot2")'
-        Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
-      shell: bash
-
-    - id: run-model-evaluation
+    - id: evaluate-model
       name: Run evaluation
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/report-evaluation@main
       with:
@@ -156,7 +146,7 @@ jobs:
           ${{ needs.read_inputs.outputs.tools_table }}
           ## All evaluated models
           ${{ needs.read_inputs.outputs.models_table }}
-#        reviewers: ${{ github.actor }}
+        reviewers: ${{ github.actor }}
 
 
 

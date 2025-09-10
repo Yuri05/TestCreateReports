@@ -1,48 +1,49 @@
-name: Check links/cross-references in reports
+name: Check links, cross-references and spelling in the markdown report
 
-on: 
+on:
   pull_request:
-    branches:
-      - main
- 
+  push:
+#    branches-ignore:
+#      - main
+
+permissions:
+  contents: read
+
+#env:
+#  REPORT_PATH: Qualification/report
+
 jobs:
-  find-modified-folders:
-    runs-on: ubuntu-latest
-    outputs:
-      folders: ${{ steps.get-folders.outputs.folders }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get list of modified folders
-        id: get-folders
-        run: |
-          base_sha="${{ github.event.pull_request.base.sha }}"
-          head_sha="${{ github.event.pull_request.head.sha }}"
-          folders=$(git diff --name-only "$base_sha" "$head_sha" | awk -F/ '{print $1}' | grep -v '^\.' | sort -u)
-          folders_json=$(printf '%s\n' $folders | jq -R . | jq -s -c .)
-          echo "folders=$folders_json" >> $GITHUB_OUTPUT
-
-  check_links:
-    needs: find-modified-folders
-    strategy:
-      fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.find-modified-folders.outputs.folders) }}
-    
+#  check-folder:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#        
+#      - name: Check if subfolder exists
+#        id: check_folder
+#        run: |
+#          if [ -d "./$REPORT_PATH" ]; then
+#            echo "REPORT_FOLDER_EXISTS=true" >> "$GITHUB_OUTPUT"
+#          else
+#            echo "REPORT_FOLDER_EXISTS=false" >> "$GITHUB_OUTPUT"
+#          fi
+#    outputs:
+#      REPORT_FOLDER_EXISTS: ${{ steps.check_folder.outputs.REPORT_FOLDER_EXISTS }}
+#      REPORT_PATH: ${{ env.REPORT_PATH }}
+#
+#  Spellcheck:
+#    uses: Open-Systems-Pharmacology/Workflows/.github/workflows/SpellChecker.yml@main
+  
+  markdown-link-check:
+#    needs: check-folder
+#    if: ${{ needs.check-folder.outputs.REPORT_FOLDER_EXISTS == 'true' }}
     uses: Open-Systems-Pharmacology/Workflows/.github/workflows/MarkdownLinksCheck.yml@main
-    with:
-      folder-path: ${{ matrix.folder }}
+#    with:
+#      folder-path: ${{ needs.check-folder.outputs.REPORT_PATH }} # env.XXX cannot be used in with:
 
-  check_xrefs:
-    needs: find-modified-folders
-    strategy:
-      fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.find-modified-folders.outputs.folders) }}
-    
+  crossref-check-with-anchors:
+#    needs: check-folder
+#    if: ${{ needs.check-folder.outputs.REPORT_FOLDER_EXISTS == 'true' }}
     uses: Open-Systems-Pharmacology/Workflows/.github/workflows/MarkdownCrossrefCheck_withAnchors.yml@main
-    with:
-      folder-path: ${{ matrix.folder }}
+#    with:
+#      folder-path: ${{ needs.check-folder.outputs.REPORT_PATH }} # env.XXX cannot be used in with:

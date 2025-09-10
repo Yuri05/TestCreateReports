@@ -6,10 +6,14 @@ name: Validate tools.csv
 # The dictionary of tools to check and their corresponding GitHub repositories is saved in check-tools.py.
 
 on:
-  workflow_dispatch:
   push:
-#    branches:
-#      - main
+    branches-ignore:
+      - master
+      - develop
+  pull_request:
+    branches-ignore:
+      - master
+      - develop
 
 jobs:
   validate-tools:

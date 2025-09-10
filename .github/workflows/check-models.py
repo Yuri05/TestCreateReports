@@ -51,13 +51,47 @@ class ModelValidator:
                 self.add_error(f"Invalid Execute value '{execute_value}' at row {i}. Must be TRUE or FALSE")
                 valid = False
         return valid
-                            
+        
+    def get_github_releases(self, repo_name: str) -> List[Dict[str, Any]]:
+        """Get all releases for a repository"""
+        url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/releases"
+        try:
+            response = requests.get(url, headers=self.headers)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return []
+        except Exception as e:
+            print(f"Error fetching releases for {repo_name}: {str(e)}")
+            return []
+            
+    def get_latest_release_version(self, releases: List[Dict[str, Any]]) -> str:
+        """Get the latest release version (including pre-releases)"""
+        if not releases:
+            return ""
+            
+        # Sort releases by published_at date
+        sorted_releases = sorted(releases, 
+                               key=lambda x: datetime.fromisoformat(x['published_at'].replace('Z', '+00:00')), 
+                               reverse=True)
+        
+        if sorted_releases:
+            # Extract version from tag_name (remove 'v' prefix)
+            tag = sorted_releases[0]['tag_name']
+            return tag[1:] if tag.startswith('v') else tag
+        return ""
+        
+    def check_release_exists(self, repo_name: str, version: str) -> bool:
+        """Check if a specific release exists"""
+        releases = self.get_github_releases(repo_name)
+        for release in releases:
+            if release['tag_name'] == f"v{version}":
+                return True
+        return False
+        
     def check_file_in_release(self, repo_name: str, version: str, file_path: str) -> bool:
-        """Check if a file exists in a specific release tag or branch"""
-        if re.fullmatch(r"\d+\.\d+", version):
-            url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref=v{version}"
-        else:
-            url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref={version}"
+        """Check if a file exists in a specific release tag"""
+        url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref=v{version}"
         try:
             response = requests.get(url, headers=self.headers)
             return response.status_code == 200
@@ -76,27 +110,68 @@ class ModelValidator:
             
             if not repo_name or not version:
                 continue
-                                      
+                
+            # Check 3a: Release exists
+            if not self.check_release_exists(repo_name, version):
+                self.add_error(f"There is no release {version} in {repo_name}")
+                valid = False
+                continue
+                
+            # Check 3b: Is latest release
+            releases = self.get_github_releases(repo_name)
+            latest_version = self.get_latest_release_version(releases)
+            if latest_version and latest_version != version:
+                self.add_error(f"{repo_name} has later release {latest_version}")
+                valid = False
+                
             # Check 3c: Snapshot file exists
             snapshot_file = f"{snapshot_name}.json"
             if not self.check_file_in_release(repo_name, version, snapshot_file):
-                self.add_error(f"Snapshot {snapshot_name} is invalid for repository {repo_name} and branch/release {version}")
+                self.add_error(f"Snapshot name {snapshot_name} is invalid for {repo_name}")
                 valid = False
                 
             # Check 3d and 3e: Workflow file exists
             if not workflow_name:
                 # Check for default workflow file
                 if not self.check_file_in_release(repo_name, version, "Evaluation/workflow.R"):
-                    self.add_error(f"The default workflow file Evaluation/workflow.R not found for repository {repo_name} and branch/release {version}")
+                    self.add_error(f"The default workflow file Evaluation/workflow.R not found for {repo_name}")
                     valid = False
             else:
                 # Check for specified workflow file
                 if not self.check_file_in_release(repo_name, version, workflow_name):
-                    self.add_error(f"The workflow file {workflow_name} not found for repository {repo_name} and branch/release {version}")
+                    self.add_error(f"The workflow file {workflow_name} not found for {repo_name}")
                     valid = False
                     
         return valid
-                    
+        
+    def get_folders_in_develop(self) -> List[str]:
+        """Get list of folders in develop branch, ignoring folders starting with ."""
+        url = "https://api.github.com/repos/Open-Systems-Pharmacology/OSP-PBPK-Model-Library/contents?ref=develop"
+        try:
+            response = requests.get(url, headers=self.headers)
+            if response.status_code == 200:
+                contents = response.json()
+                folders = [item['name'] for item in contents 
+                          if item['type'] == 'dir' and not item['name'].startswith('.')]
+                return folders
+            return []
+        except Exception as e:
+            print(f"Error fetching folders from develop branch: {str(e)}")
+            return []
+            
+    def check_folder_coverage(self, rows: List[Dict[str, str]]) -> bool:
+        """Check that all folders in develop branch are covered in CSV"""
+        valid = True
+        develop_folders = self.get_folders_in_develop()
+        csv_folders = set(row.get('Folder name', '').strip() for row in rows if row.get('Folder name', '').strip())
+        
+        for folder in develop_folders:
+            if folder not in csv_folders:
+                self.add_error(f"Folder {folder} is not found")
+                valid = False
+                
+        return valid
+        
     def check_additional_projects(self, rows: List[Dict[str, str]]) -> bool:
         """Check additional projects URLs and versions"""
         valid = True
@@ -122,7 +197,21 @@ class ModelValidator:
                     self.add_error(f"Invalid URL for additional project: {url}")
                     valid = False
                     continue
-                                        
+                    
+                # Check 5b: Extract repo name and version, check latest release
+                parts = project.split('/')
+                if len(parts) >= 2:
+                    repo_name = parts[0]
+                    version = parts[1]
+                    
+                    # Check if this is the latest release
+                    releases = self.get_github_releases(repo_name)
+                    latest_version = self.get_latest_release_version(releases)
+                    
+                    if latest_version and latest_version != version.replace('v', ''):
+                        self.add_error(f"Additional project {project} has the newest release {latest_version}")
+                        valid = False
+                        
         return valid
         
     def validate_models_csv(self, file_path: str = 'models.csv') -> bool:
@@ -146,7 +235,10 @@ class ModelValidator:
         
         # Check 3: Repository validations
         self.check_repository_validations(rows)
-                
+        
+        # Check 4: Folder coverage
+        self.check_folder_coverage(rows)
+        
         # Check 5: Additional projects
         self.check_additional_projects(rows)
         

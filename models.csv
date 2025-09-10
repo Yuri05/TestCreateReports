@@ -1,5 +1,5 @@
 Execute,Repository name,Released version,Snapshot name,Folder name,Workflow name,Additional projects
-FALSE,7E3-Model,master,7E3,7E3,,
+TRUE,Evaluation-plan-template,master,Compound,Compound-Folder,,
 FALSE,7E3-Model,1.0,7E3,7E3,,
 FALSE,Alfentanil-Model,3.0,Alfentanil-Model,Alfentanil,,Alfentanil-Pediatrics/v2.0/Alfentanil-Pediatrics.json
 FALSE,Alprazolam-Model,2.0,Alprazolam-Model,Alprazolam,,
