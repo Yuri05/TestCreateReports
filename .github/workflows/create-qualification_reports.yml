@@ -72,25 +72,21 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.read_inputs.outputs.qualifications) }}
       fail-fast: false
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    - name: Rebase from main
+    - name: Rebase from develop
       run: |
         git config --global core.longpaths true
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        git fetch origin main
-        git rebase -Xours origin/main
-        if git rev-parse HEAD^ >/dev/null 2>&1; then
-          git reset HEAD^
-        else
-          echo "No parent commit for HEAD. Skipping reset."
-        fi
+        git checkout -b ${{ github.ref_name }}-${{ matrix['Repository name'] }}
+        git push -u origin ${{ github.ref_name }}-${{ matrix['Repository name'] }}
+        git fetch origin develop
+        git rebase -Xours origin/develop
+        git reset HEAD^
         [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
         git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
         git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
@@ -101,12 +97,6 @@ jobs:
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
       with:
         tools-path: tools.csv
-
-    - name: Downgrade ggplot2 to 3.5.2
-      run: |
-        Rscript -e 'remove.packages("ggplot2")'
-        Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
-      shell: bash
 
     - id: run-qualification
       name: Run qualification
@@ -140,9 +130,9 @@ jobs:
       with:
         # Use a custom PAT because GITHUB_TOKEN cannot trigger subsequent workflows (here: required checks on pull_request).
         # S. https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
-#        token: ${{ secrets.PAT_PR_TRIGGERED_BY_ACTIONS }}
-        branch: ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        base: main
+        token: ${{ secrets.PAT_PR_TRIGGERED_BY_ACTIONS }}
+        branch: ${{ github.ref_name }}-${{ matrix['Repository name'] }}
+        base: develop
         commit-message: ${{ inputs.commit-message }}
         add-paths: |
             ${{ matrix['Folder name'] }}/images/**
@@ -154,5 +144,5 @@ jobs:
           ${{ needs.read_inputs.outputs.tools_table }}
           ## Qualification plans
           ${{ needs.read_inputs.outputs.qualifications_table }}
-#        reviewers: ${{ github.actor }}
+        reviewers: ${{ github.actor }}
         

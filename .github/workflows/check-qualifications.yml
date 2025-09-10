@@ -2,16 +2,23 @@ name: Validate qualifications.csv
 # Performs a number of checks on the qualifications.csv file.
 # - General checks (valid CSV structure, no BOM, UTF-8 encoding, no empty lines).
 # - Ensures that every value in the <Execute> column is either TRUE or FALSE.
-# - Checks that the OSP qualification plan release given by the combination of <Repository name> and <Release Version> exists.
+# - Checks that the OSP qualification plan release given by the combination of the repository name and released version exists.
+# - The released version is the chronologically(!) latest available release in the repository (including pre-releases).
 # - The workflow name is valid for the combination of <Repository name> and <Released version>:
 #   - If empty: "Qualification/workflow.R" must exist in the repository.
 #   - If not empty, the given workflow name must exist in the repository.
+# - For each folder in the develop branch (excl. those starting with "."), there must be an entry in the <Folder name> column.
 
 on:
   workflow_dispatch:
   push:
-#    branches:
-#      - main
+    branches-ignore:
+      - master
+      - develop
+  pull_request:
+    branches-ignore:
+      - master
+      - develop
 
 jobs:
   check-general-csv-structure:
