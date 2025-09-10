@@ -1,0 +1,153 @@
+name: Create evaluation reports and projects
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit-message:
+        required: false
+        type: string
+        default: 'VN.N Update N'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  WORKING_DIR: 'D:/0'
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  read_inputs:
+    runs-on: ubuntu-latest
+    outputs:
+      tools_table: ${{ steps.tools_table.outputs.tools-table }}
+      pk_sim_version: ${{ steps.tools_table.outputs.pk-sim }}
+      qualification_framework_version: ${{ steps.tools_table.outputs.qualification-framework }}
+      models_table: ${{ steps.models_table.outputs.table }}
+      models: ${{steps.models.outputs.data}}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - id: tools_table
+      name: Get tools table
+      uses: Open-Systems-Pharmacology/Workflows/.github/actions/get-tools-versions@main
+      with:
+        tools-path: tools.csv
+
+    - id: install-r
+      name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: 'latest'
+        use-public-rspm: true
+    
+    - name: Read and export models as json
+      run: |
+        Rscript -e 'install.packages("jsonlite")'
+        Rscript -e '
+        modelsData <- read.csv("models.csv", check.names = FALSE, stringsAsFactors = FALSE, colClasses = c("logical", rep("character", 6)))
+        cat(jsonlite::toJSON(modelsData[modelsData$Execute, ], dataframe = "rows"))
+        ' > models.json
+      shell: bash
+    
+    - name: Output models data for table conversion
+      id: models_data
+      run: echo "json=$(cat models.json)" >> $GITHUB_OUTPUT
+      shell: bash
+    
+    - name: Markdown table for models
+      uses: buildingcash/json-to-markdown-table-action@v1 
+      id: models_table
+      with: 
+        json: "${{ steps.models_data.outputs.json }}"
+    
+    - name: Set models data as output for matrix run strategy
+      id: models
+      run: echo "data={\"include\":$(cat models.json)}" >> $GITHUB_OUTPUT
+      shell: bash
+  
+  evaluation:
+    needs: read_inputs
+    strategy:
+      matrix: ${{ fromJSON(needs.read_inputs.outputs.models) }}
+      fail-fast: false
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Rebase from main
+      run: |
+        git config --global core.longpaths true
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
+        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
+        git fetch origin main
+        git rebase -Xours origin/main
+        git reset HEAD^
+        [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
+        git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
+        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
+      shell: bash
+
+    - id: qualification-environment
+      name: Setup Qualification Environment
+      uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
+      with:
+        tools-path: tools.csv
+
+    - id: evaluate-model
+      name: Run evaluation
+      uses: Open-Systems-Pharmacology/Workflows/.github/actions/report-evaluation@main
+      with:
+          model-repo: ${{ matrix['Repository name'] }}
+          model-version: ${{ matrix['Released version'] }}
+          folder-name: ${{ matrix['Folder name'] }}
+          snapshot: ${{ matrix['Snapshot name'] }}
+          evaluation: 'true'
+          workflow-script: ${{ matrix['Workflow name'] }}
+          additional-project-urls: ${{ matrix['Additional projects'] }}
+          pk-sim-version: ${{ needs.read_inputs.outputs.pk_sim_version }}
+          qualification-framework-version: ${{ needs.read_inputs.outputs.qualification_framework_version }}
+          save-model-file: 'true'
+          save-pdf: 'true'
+          run-directory: ${{ env.WORKING_DIR }}
+
+    - id: copy-to-workspace
+      name: Copy back to workspace and clean working directory before PR
+      run: |
+        file.copy(
+          list.files("${{ env.WORKING_DIR }}", full.names = TRUE), 
+          normalizePath(Sys.getenv("GITHUB_WORKSPACE"), winslash = "/"),
+          recursive = TRUE
+          )
+        unlink("${{ env.WORKING_DIR }}", recursive = TRUE)
+      shell: Rscript {0}
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        # Use a custom PAT because GITHUB_TOKEN cannot trigger subsequent workflows (here: required checks on pull_request).
+        # S. https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
+#        token: ${{ secrets.PAT_PR_TRIGGERED_BY_ACTIONS }}
+        branch: ${{ matrix['Repository name'] }}-${{ github.run_number }}
+        base: main
+        commit-message: ${{ inputs.commit-message }}
+        add-paths: |
+            */images/**
+            */*_report.pdf
+            */*.pksim5
+            */*_report.md
+        title: Update Evaluation Report for ${{ matrix['Snapshot name'] }}
+        body: |
+          ## Tools
+          ${{ needs.read_inputs.outputs.tools_table }}
+          ## All evaluated models
+          ${{ needs.read_inputs.outputs.models_table }}
+        reviewers: ${{ github.actor }}
+
+
+
+
