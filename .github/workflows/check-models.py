@@ -80,7 +80,7 @@ class ModelValidator:
             # Check 3c: Snapshot file exists
             snapshot_file = f"{snapshot_name}.json"
             if not self.check_file_in_release(repo_name, version, snapshot_file):
-                self.add_error(f"Snapshot name {snapshot_name} is invalid for {repo_name}")
+                self.add_error(f"Snapshot {snapshot_name} is invalid for the repository {repo_name} and branch/release {version}")
                 valid = False
                 
             # Check 3d and 3e: Workflow file exists
