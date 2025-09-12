@@ -2,7 +2,7 @@ name: Validate models.csv
 # Performs a number of checks on the models.csv file.
 # - General checks (valid CSV structure, no BOM, UTF-8 encoding, no empty lines).
 # - Ensures that every value in the <Execute> column is either TRUE or FALSE.
-# - The <Snapshot name>.json exists at the root level of the <Repository name> tagged with v<Release Version>.
+# - The <Snapshot name>.json exists at the root level of the <Repository name> for release or branch <Release Version>.
 # - The workflow name is valid for the combination of <Repository name> and <Released version>:
 #   - If empty: "Evaluation/workflow.R" must exist in the repository.
 #   - If not empty, the given workflow name must exist in the repository.
