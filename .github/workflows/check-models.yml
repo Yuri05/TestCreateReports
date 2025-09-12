@@ -8,21 +8,14 @@ name: Validate models.csv
 # - The workflow name is valid for the combination of <Repository name> and <Released version>:
 #   - If empty: "Evaluation/workflow.R" must exist in the repository.
 #   - If not empty, the given workflow name must exist in the repository.
-# - For each folder in the develop branch (excl. those starting with "."), there must be an entry in the <Folder name> column.
 # - For each entry in the <Additional projects> column - split by pipe and check that every split entry:
 #   - has a valid URL when prefixed with 'https://raw.githubusercontent.com/Open-Systems-Pharmacology/'
-#   - belongs to the chronologically latest available release in its repository (including pre-releases).
 
 on:
   workflow_dispatch:
   push:
-    branches-ignore:
-      - master
-      - develop
-  pull_request:
-    branches-ignore:
-      - master
-      - develop
+#    branches:
+#      - main
 
 jobs:
   check-general-csv-structure:
