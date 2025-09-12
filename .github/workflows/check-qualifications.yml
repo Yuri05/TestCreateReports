@@ -2,7 +2,7 @@ name: Validate qualifications.csv
 # Performs a number of checks on the qualifications.csv file.
 # - General checks (valid CSV structure, no BOM, UTF-8 encoding, no empty lines).
 # - Ensures that every value in the <Execute> column is either TRUE or FALSE.
-# - Checks that the OSP qualification plan release given by the combination of the repository name and released version exists.
+# - Checks that the OSP qualification plan release given by the combination of <Repository name> and <Release Version> exists.
 # - The workflow name is valid for the combination of <Repository name> and <Released version>:
 #   - If empty: "Qualification/workflow.R" must exist in the repository.
 #   - If not empty, the given workflow name must exist in the repository.

@@ -52,30 +52,12 @@ class QualificationValidator:
                 valid = False
         return valid
         
-    def get_github_releases(self, repo_name: str) -> List[Dict[str, Any]]:
-        """Get all releases for a repository"""
-        url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/releases"
-        try:
-            response = requests.get(url, headers=self.headers)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return []
-        except Exception as e:
-            print(f"Error fetching releases for {repo_name}: {str(e)}")
-            return []
-                
-    def check_release_exists(self, repo_name: str, version: str) -> bool:
-        """Check if a specific release exists"""
-        releases = self.get_github_releases(repo_name)
-        for release in releases:
-            if release['tag_name'] == f"v{version}":
-                return True
-        return False
-        
     def check_file_in_release(self, repo_name: str, version: str, file_path: str) -> bool:
-        """Check if a file exists in a specific release tag"""
-        url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref=v{version}"
+        """Check if a file exists in a specific release tag or branch"""
+        if re.fullmatch(r"\d+\.\d+", version):
+            url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref=v{version}"
+        else:
+            url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref={version}"
         try:
             response = requests.get(url, headers=self.headers)
             return response.status_code == 200
@@ -93,23 +75,17 @@ class QualificationValidator:
             
             if not repo_name or not version:
                 continue
-                
-            # Check 3a: Release exists
-            if not self.check_release_exists(repo_name, version):
-                self.add_error(f"There is no release {version} in {repo_name}")
-                valid = False
-                continue
-                            
+                                       
             # Check 3d and 3e: Workflow file exists
             if not workflow_name:
                 # Check for default workflow file
                 if not self.check_file_in_release(repo_name, version, "Qualification/workflow.R"):
-                    self.add_error(f"The default workflow file Qualification/workflow.R not found for {repo_name}")
+                    self.add_error(f"The default workflow file Qualification/workflow.R not found for repository {repo_name} and branch/release {version}")
                     valid = False
             else:
                 # Check for specified workflow file
                 if not self.check_file_in_release(repo_name, version, workflow_name):
-                    self.add_error(f"The workflow file {workflow_name} not found for {repo_name}")
+                    self.add_error(f"The workflow file {workflow_name} not found for repository {repo_name} and branch/release {version}")
                     valid = False
                     
         return valid
