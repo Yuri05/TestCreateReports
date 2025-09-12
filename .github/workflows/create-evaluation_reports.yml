@@ -102,7 +102,7 @@ jobs:
       with:
         tools-path: tools.csv
 
-    - id: evaluate-model
+    - id: run-model-evaluation
       name: Run evaluation
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/report-evaluation@main
       with:
@@ -150,7 +150,7 @@ jobs:
           ${{ needs.read_inputs.outputs.tools_table }}
           ## All evaluated models
           ${{ needs.read_inputs.outputs.models_table }}
-        reviewers: ${{ github.actor }}
+#        reviewers: ${{ github.actor }}
 
 
 
