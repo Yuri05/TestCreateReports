@@ -80,19 +80,19 @@ class ModelValidator:
             # Check 3c: Snapshot file exists
             snapshot_file = f"{snapshot_name}.json"
             if not self.check_file_in_release(repo_name, version, snapshot_file):
-                self.add_error(f"Snapshot {snapshot_name} is invalid for the repository {repo_name} and branch/release {version}")
+                self.add_error(f"Snapshot {snapshot_name} is invalid for repository {repo_name} and branch/release {version}")
                 valid = False
                 
             # Check 3d and 3e: Workflow file exists
             if not workflow_name:
                 # Check for default workflow file
                 if not self.check_file_in_release(repo_name, version, "Evaluation/workflow.R"):
-                    self.add_error(f"The default workflow file Evaluation/workflow.R not found for {repo_name}")
+                    self.add_error(f"The default workflow file Evaluation/workflow.R not found for repository {repo_name} and branch/release {version}")
                     valid = False
             else:
                 # Check for specified workflow file
                 if not self.check_file_in_release(repo_name, version, workflow_name):
-                    self.add_error(f"The workflow file {workflow_name} not found for {repo_name}")
+                    self.add_error(f"The workflow file {workflow_name} not found for repository {repo_name} and branch/release {version}")
                     valid = False
                     
         return valid
