@@ -51,31 +51,13 @@ class ModelValidator:
                 self.add_error(f"Invalid Execute value '{execute_value}' at row {i}. Must be TRUE or FALSE")
                 valid = False
         return valid
-        
-    def get_github_releases(self, repo_name: str) -> List[Dict[str, Any]]:
-        """Get all releases for a repository"""
-        url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/releases"
-        try:
-            response = requests.get(url, headers=self.headers)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return []
-        except Exception as e:
-            print(f"Error fetching releases for {repo_name}: {str(e)}")
-            return []
-                
-    def check_release_exists(self, repo_name: str, version: str) -> bool:
-        """Check if a specific release exists"""
-        releases = self.get_github_releases(repo_name)
-        for release in releases:
-            if release['tag_name'] == f"v{version}":
-                return True
-        return False
-        
+                            
     def check_file_in_release(self, repo_name: str, version: str, file_path: str) -> bool:
-        """Check if a file exists in a specific release tag"""
-        url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref=v{version}"
+        """Check if a file exists in a specific release tag or branch"""
+        if re.fullmatch(r"\d+\.\d+", version):
+            url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref=v{version}"
+        else:
+            url = f"https://api.github.com/repos/Open-Systems-Pharmacology/{repo_name}/contents/{file_path}?ref={version}"
         try:
             response = requests.get(url, headers=self.headers)
             return response.status_code == 200
@@ -94,13 +76,7 @@ class ModelValidator:
             
             if not repo_name or not version:
                 continue
-                
-            # Check 3a: Release exists
-            if not self.check_release_exists(repo_name, version):
-                self.add_error(f"There is no release {version} in {repo_name}")
-                valid = False
-                continue
-                          
+                                      
             # Check 3c: Snapshot file exists
             snapshot_file = f"{snapshot_name}.json"
             if not self.check_file_in_release(repo_name, version, snapshot_file):
