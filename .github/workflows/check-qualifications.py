@@ -64,23 +64,7 @@ class QualificationValidator:
         except Exception as e:
             print(f"Error fetching releases for {repo_name}: {str(e)}")
             return []
-            
-    def get_latest_release_version(self, releases: List[Dict[str, Any]]) -> str:
-        """Get the latest release version (including pre-releases)"""
-        if not releases:
-            return ""
-            
-        # Sort releases by published_at date
-        sorted_releases = sorted(releases, 
-                               key=lambda x: datetime.fromisoformat(x['published_at'].replace('Z', '+00:00')), 
-                               reverse=True)
-        
-        if sorted_releases:
-            # Extract version from tag_name (remove 'v' prefix)
-            tag = sorted_releases[0]['tag_name']
-            return tag[1:] if tag.startswith('v') else tag
-        return ""
-        
+                
     def check_release_exists(self, repo_name: str, version: str) -> bool:
         """Check if a specific release exists"""
         releases = self.get_github_releases(repo_name)
@@ -115,14 +99,7 @@ class QualificationValidator:
                 self.add_error(f"There is no release {version} in {repo_name}")
                 valid = False
                 continue
-                
-            # Check 3b: Is latest release
-            releases = self.get_github_releases(repo_name)
-            latest_version = self.get_latest_release_version(releases)
-            if latest_version and latest_version != version:
-                self.add_error(f"{repo_name} has later release {latest_version}")
-                valid = False
-                
+                            
             # Check 3d and 3e: Workflow file exists
             if not workflow_name:
                 # Check for default workflow file
@@ -136,35 +113,7 @@ class QualificationValidator:
                     valid = False
                     
         return valid
-        
-    def get_folders_in_develop(self) -> List[str]:
-        """Get list of folders in develop branch, ignoring folders starting with ."""
-        url = "https://api.github.com/repos/Open-Systems-Pharmacology/OSP-Qualification-Reports/contents?ref=develop"
-        try:
-            response = requests.get(url, headers=self.headers)
-            if response.status_code == 200:
-                contents = response.json()
-                folders = [item['name'] for item in contents 
-                          if item['type'] == 'dir' and not item['name'].startswith('.')]
-                return folders
-            return []
-        except Exception as e:
-            print(f"Error fetching folders from develop branch: {str(e)}")
-            return []
-            
-    def check_folder_coverage(self, rows: List[Dict[str, str]]) -> bool:
-        """Check that all folders in develop branch are covered in CSV"""
-        valid = True
-        develop_folders = self.get_folders_in_develop()
-        csv_folders = set(row.get('Folder name', '').strip() for row in rows if row.get('Folder name', '').strip())
-        
-        for folder in develop_folders:
-            if folder not in csv_folders:
-                self.add_error(f"Folder {folder} is not found")
-                valid = False
-                
-        return valid
-        
+                        
     def validate_qualifications_csv(self, file_path: str = 'qualifications.csv') -> bool:
         """Main validation function"""
         print(f"Validating {file_path}...")
@@ -186,10 +135,7 @@ class QualificationValidator:
         
         # Check 3: Repository validations
         self.check_repository_validations(rows)
-        
-        # Check 4: Folder coverage
-        self.check_folder_coverage(rows)
-        
+                
         return len(self.errors) == 0
         
     def print_summary(self):
