@@ -112,7 +112,7 @@ jobs:
       run: |
         while ($true) {
           Get-Counter -Counter "\Processor(_Total)\% Processor Time", "\Memory\Available MBytes"
-          Start-Sleep -Seconds 20
+          Start-Sleep -Seconds 30
         }
       shell: pwsh
     
