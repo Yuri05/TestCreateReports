@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.read_inputs.outputs.qualifications) }}
       fail-fast: false
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -108,6 +108,14 @@ jobs:
         Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
       shell: bash
 
+    - name: Monitor Resource Usage
+      run: |
+        while ($true) {
+          Get-Counter -Counter "\Processor(_Total)\% Processor Time", "\Memory\Available MBytes"
+          Start-Sleep -Seconds 20
+        }
+      shell: pwsh
+    
     - id: run-qualification
       name: Run qualification
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/report-evaluation@main
