@@ -117,6 +117,7 @@ jobs:
             $mem = (Get-Process -Name "Runner.Listener").WorkingSet64 / 1MB
             $line = "$date -- CPU: $($cpu)%, Memory: $($mem) MB"
             Add-Content -Path "C:\actions_runner\_work\runner_stats.log" -Value $line
+            Write-Output $line
             Start-Sleep -Seconds 60
           }
         }
