@@ -108,21 +108,51 @@ jobs:
         Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
       shell: bash
 
-    - name: Monitor Resource Usage
+    - name: Monitor Runner Resource Usage
+      # Use bash to launch the PowerShell script in the background
+      shell: bash
       run: |
-        Start-Job -ScriptBlock {
+        # Define the PowerShell script as a multi-line string in bash
+        pwsh_script='
+          $logFile = "C:\actions_runner\_work\runner_stats.log"
+          echo "Starting resource monitoring. Logging to $logFile and STDOUT."
+
           while ($true) {
-            $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            $cpu = (Get-Counter -Counter "\Process(Runner.Listener)\% Processor Time").CounterSamples.CookedValue
-            $mem = (Get-Process -Name "Runner.Listener").WorkingSet64 / 1MB
-            $line = "$date -- CPU: $($cpu)%, Memory: $($mem) MB"
-            Add-Content -Path "C:\actions_runner\_work\runner_stats.log" -Value $line
-            Write-Output $line
-            Start-Sleep -Seconds 60
+            try {
+              # Get the Runner.Listener process, which is the main agent process
+              $runnerProcess = Get-Process -Name "Runner.Listener" -ErrorAction Stop
+          
+              # Get CPU usage for that specific process instance
+              $cpuCounter = (Get-Counter -Counter "\Process($($runnerProcess.ProcessName))\ID Process" -InstanceName "$($runnerProcess.Id)").CounterSamples.CookedValue
+              $cpuUsage = (Get-Counter -Counter "\Process($($runnerProcess.ProcessName))\% Processor Time" -InstanceName "$($runnerProcess.Id)").CounterSamples.CookedValue
+          
+              $mem = $runnerProcess.WorkingSet64 / 1MB
+          
+              $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+              $line = "$date -- Runner.Listener (PID: $($runnerProcess.Id)) -- CPU: $($cpuUsage.ToString('F2'))%, Memory: $($mem.ToString('F2')) MB"
+          
+              # Write to the GHA live log
+              Write-Output $line
+          
+              # Also write to the log file for the artifact
+              Add-Content -Path $logFile -Value $line
+            }
+            catch {
+              # Handle cases where the process might not be found immediately or disappears
+              $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+              $errorLine = "$date -- Could not find Runner.Listener process. It may have been terminated."
+              Write-Output $errorLine
+              Add-Content -Path $logFile -Value $errorLine
+            }
+        
+            Start-Sleep -Seconds 5
           }
-        }
-      shell: pwsh
+        '
     
+        # Execute the PowerShell script in the background using pwsh
+        # The output will be streamed to this step's log
+        pwsh -Command "$pwsh_script" &
+
     - id: run-qualification
       name: Run qualification
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/report-evaluation@main
