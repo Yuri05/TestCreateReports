@@ -110,9 +110,15 @@ jobs:
 
     - name: Monitor Resource Usage
       run: |
-        while ($true) {
-          Get-Counter -Counter "\Processor(_Total)\% Processor Time", "\Memory\Available MBytes"
-          Start-Sleep -Seconds 30
+        Start-Job -ScriptBlock {
+          while ($true) {
+            $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            $cpu = (Get-Counter -Counter "\Process(Runner.Listener)\% Processor Time").CounterSamples.CookedValue
+            $mem = (Get-Process -Name "Runner.Listener").WorkingSet64 / 1MB
+            $line = "$date -- CPU: $($cpu)%, Memory: $($mem) MB"
+            Add-Content -Path "C:\actions_runner\_work\runner_stats.log" -Value $line
+            Start-Sleep -Seconds 60
+          }
         }
       shell: pwsh
     
@@ -132,6 +138,13 @@ jobs:
           save-pdf: 'true'
           run-directory: ${{ env.WORKING_DIR }}
 
+    - name: Upload Resource Logs
+      if: always() # This ensures the logs are uploaded even if the R step fails
+      uses: actions/upload-artifact@v4
+      with:
+        name: runner-resource-logs
+        path: C:\actions_runner\_work\runner_stats.log
+    
     - id: copy-to-workspace
       name: Copy back to workspace and clean working directory before PR
       run: |
