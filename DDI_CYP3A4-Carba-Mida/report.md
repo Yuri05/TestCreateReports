@@ -1,10 +1,10 @@
 # CYP3A4 DDI Qualification
 
-| Version                         | tmp_Carbamazepine-Midazolan-DDI-OSP12.1                                                   |
+| Version                         | 2.1-OSP12.1                                                   |
 | ------------------------------- | ------------------------------------------------------------ |
-| Qualification Plan Release      | [https://github.com/Open-Systems-Pharmacology/Qualification-DDI-CYP3A4/releases/tag/vtmp_Carbamazepine-Midazolan-DDI](https://github.com/Open-Systems-Pharmacology/Qualification-DDI-CYP3A4/releases/tag/vtmp_Carbamazepine-Midazolan-DDI) |
+| Qualification Plan Release      | [https://github.com/Open-Systems-Pharmacology/Qualification-DDI-CYP3A4/releases/tag/v2.1](https://github.com/Open-Systems-Pharmacology/Qualification-DDI-CYP3A4/releases/tag/v2.1) |
 | OSP Version                     | 12.1                                                          |
-| Qualification Framework Version | 3.3                                                          |
+| Qualification Framework Version | 3.4                                                          |
 
 This qualification report is filed at:
 
@@ -208,7 +208,7 @@ The carbamazepine-efavirenz interaction was evaluated using one clinical DDI stu
 ### 1.2.3 Carbamazepine - Midazolam DDI<a id="network-carbamazepine-midazolam-ddi"></a>
 
 The release of the snapshot containing the respective simulations can be found here:
-[https://github.com/Open-Systems-Pharmacology/Carbamazepine-Midazolam-DDI/releases/tag/v1.0](https://github.com/Open-Systems-Pharmacology/Carbamazepine-Midazolam-DDI/releases/tag/v1.0)
+[https://github.com/Open-Systems-Pharmacology/Carbamazepine-Midazolam-DDI/releases/tag/v1.1](https://github.com/Open-Systems-Pharmacology/Carbamazepine-Midazolam-DDI/releases/tag/v1.1)
 
 The carbamazepine-midazolam interaction was evaluated using three clinical DDI studies ([Lutz 2018](#4-references), [Kanefendt 2023](#4-references), [Datta-Mannan 2024](#4-references)).
 
