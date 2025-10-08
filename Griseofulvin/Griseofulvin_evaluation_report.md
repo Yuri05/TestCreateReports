@@ -3,8 +3,8 @@
 | Version                                         | master-OSP12.1                                                   |
 | ----------------------------------------------- | ------------------------------------------------------------ |
 | based on *Model Snapshot* and *Evaluation Plan* | https://github.com/Open-Systems-Pharmacology/Griseofulvin-Model/releases/tag/vmaster |
-| OSP Version                                     | 11.3                                                          |
-| Qualification Framework Version                 | 11.3                                                          |
+| OSP Version                                     | 12.1                                                          |
+| Qualification Framework Version                 | 3.4                                                          |
 
 This evaluation report and the corresponding PK-Sim project file are filed at:
 
