@@ -99,12 +99,18 @@ jobs:
 #        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
 #      shell: bash
 
+    # Compute hash of tools.csv and export to environment for subsequent steps
+    - name: Compute tools.csv hash
+      id: compute-tools-hash
+      shell: bash
+      run: echo "TOOLS_CSV_HASH=${{ hashFiles('tools.csv') }}" >> $GITHUB_ENV
+
     # Restore previously prepared environment if tools.csv was unchanged
     - name: Restore setup cache
       id: cache-setup
       uses: actions/cache/restore@v4
       with:
-        key: ospsuite-${{ hashFiles('tools.csv') }}
+        key: ospsuite-${{ env.TOOLS_CSV_HASH }}
         path: |
           ${{ env.R_LIBS_USER }}
           ${{ github.workspace }}/PK-Sim
@@ -153,7 +159,7 @@ jobs:
       if: steps.cache-setup.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
-        key: ospsuite-${{ hashFiles('tools.csv') }}
+        key: ospsuite-${{ env.TOOLS_CSV_HASH }}
         path: |
           ${{ env.R_LIBS_USER }}
           ${{ github.workspace }}/PK-Sim
