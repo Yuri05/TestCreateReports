@@ -66,14 +66,6 @@ jobs:
       run: echo "data={\"include\":$(cat models.json)}" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Determine first model repo (for single cache save authority)
-      id: first_model
-      run: |
-        # Extract first "Repository name" from the JSON
-        REPO=$(jq -r '.[0]."Repository name"' models.json)
-        echo "First repo: $REPO"
-        echo "first_repo=$REPO" >> $GITHUB_OUTPUT
-
   evaluation:
     needs: read_inputs
     strategy:
@@ -90,16 +82,6 @@ jobs:
       id: compute-tools-hash
       shell: bash
       run: echo "TOOLS_CSV_HASH=${{ hashFiles('tools.csv') }}" >> $GITHUB_ENV
-
-    - name: Debug pre-restore
-      run: |
-        echo "Branch: $GITHUB_REF_NAME"
-        echo "Commit: $GITHUB_SHA"
-        echo "TOOLS_CSV_HASH (env): $TOOLS_CSV_HASH"
-        echo "Intended cache key: ${{ runner.os }}-ospsuite-$TOOLS_CSV_HASH"
-        echo "First model repo allowed to save: ${{ needs.read_inputs.outputs.first_model_repo }}"
-        echo "This matrix repo: ${{ matrix['Repository name'] }}"
-      shell: bash
 
     - name: Restore setup cache
       id: cache-setup
