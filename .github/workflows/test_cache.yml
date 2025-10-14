@@ -103,9 +103,9 @@ jobs:
 
     - name: Restore setup cache
       id: cache-setup
-      uses: actions/cache/restore@v4
+      uses: actions/cache@v4
       with:
-        key: ${{ runner.os }}-ospsuite-${{ env.TOOLS_CSV_HASH }}
+        key: SingleAction-ospsuite-${{ env.TOOLS_CSV_HASH }}
         path: |
           ${{ env.R_LIBS_USER }}
           ${{ github.workspace }}/PK-Sim
@@ -139,65 +139,4 @@ jobs:
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
       with:
         tools-path: tools.csv
-
-    - name: Downgrade ggplot2 to 3.5.2
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      run: |
-        Rscript -e 'remove.packages("ggplot2")'
-        Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
-      shell: bash
-
-    - name: Debug cached paths before save
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      run: |
-        echo "Listing R library root: $R_LIBS_USER"
-        if [ -d "$R_LIBS_USER" ]; then
-          ls -l "$R_LIBS_USER" | head -n 50
-        else
-          echo "R library directory missing"
-        fi
-        echo "PK-Sim dir:"
-        ls -l PK-Sim || echo "PK-Sim missing"
-        echo "QualificationRunner dir:"
-        ls -l QualificationRunner || echo "QualificationRunner missing"
-      shell: bash
-
-    - name: Determine if cache contents are non-empty
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      id: check-cache-contents
-      shell: bash
-      run: |
-        fail=0
-        check_nonempty () {
-          local p="$1"
-          if [ ! -d "$p" ]; then
-            echo "::warning::Directory $p does not exist"
-            fail=1
-          else
-            if [ -z "$(ls -A "$p" 2>/dev/null)" ]; then
-              echo "::warning::Directory $p is empty"
-              fail=1
-            fi
-          fi
-        }
-        check_nonempty "$R_LIBS_USER"
-        check_nonempty "PK-Sim"
-        check_nonempty "QualificationRunner"
-        if [ $fail -eq 1 ]; then
-          echo "SKIP_SAVE=1" >> $GITHUB_ENV
-        fi
-
-    - name: Save setup cache
-      # Only one matrix job saves (the one matching first_model_repo) and only if directories non-empty
-      if: |
-        steps.cache-setup.outputs.cache-hit != 'true' &&
-        env.SKIP_SAVE != '1' &&
-        matrix['Repository name'] == needs.read_inputs.outputs.first_model_repo
-      uses: actions/cache/save@v4
-      with:
-        key: ${{ runner.os }}-ospsuite-${{ env.TOOLS_CSV_HASH }}
-        path: |
-          ${{ env.R_LIBS_USER }}
-          ${{ github.workspace }}/PK-Sim
-          ${{ github.workspace }}/QualificationRunner
-
+        
