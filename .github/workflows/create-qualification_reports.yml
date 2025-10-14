@@ -76,8 +76,8 @@ jobs:
     env:
       # Stable, workspace-local R library so we can cache it reliably
       R_LIBS_USER: ${{ github.workspace }}/RLibrary
-      # Cache key derived from tools.csv contents and OS (runner)
-      SETUP_CACHE_KEY: ${{ runner.os }}-ospsuite-${{ hashFiles('tools.csv') }}    
+      # Cache key derived from tools.csv contents
+      SETUP_CACHE_KEY: ospsuite-${{ hashFiles('tools.csv') }}    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
