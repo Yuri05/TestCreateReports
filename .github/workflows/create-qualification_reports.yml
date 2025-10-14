@@ -73,40 +73,93 @@ jobs:
       matrix: ${{ fromJSON(needs.read_inputs.outputs.qualifications) }}
       fail-fast: false
     runs-on: windows-2022
+    env:
+      # Stable, workspace-local R library so we can cache it reliably
+      R_LIBS_USER: ${{ github.workspace }}/RLibrary
+      # Cache key derived from tools.csv contents and OS (runner)
+      SETUP_CACHE_KEY: ${{ runner.os }}-ospsuite-${{ hashFiles('tools.csv') }}    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    - name: Rebase from main
-      run: |
-        git config --global core.longpaths true
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        git fetch origin main
-        git rebase -Xours origin/main
-        if git rev-parse HEAD^ >/dev/null 2>&1; then
-          git reset HEAD^
-        else
-          echo "No parent commit for HEAD. Skipping reset."
-        fi
-        [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
-        git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
-        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
+#    - name: Rebase from main
+#      run: |
+#        git config --global core.longpaths true
+#        git config --global user.name 'github-actions'
+#        git config --global user.email 'github-actions@github.com'
+#        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
+#        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
+#        git fetch origin main
+#        git rebase -Xours origin/main
+#        if git rev-parse HEAD^ >/dev/null 2>&1; then
+#          git reset HEAD^
+#        else
+#          echo "No parent commit for HEAD. Skipping reset."
+#        fi
+#        [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
+#        git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
+#        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
+#      shell: bash
+
+    # Restore previously prepared environment if tools.csv was unchanged
+    - name: Restore setup cache
+      id: cache-setup
+      uses: actions/cache/restore@v4
+      with:
+        key: ${{ env.SETUP_CACHE_KEY }}
+        path: |
+          ${{ env.R_LIBS_USER }}
+          ${{ github.workspace }}/PK-Sim
+          ${{ github.workspace }}/QualificationRunner
+
+    # Always compute the R version from tools.csv so we can install R on cached runs
+    - id: get-tools-versions
+      name: Get tools versions (for R setup on cached runs)
+      uses: Open-Systems-Pharmacology/Workflows/.github/actions/get-tools-versions@main
+      with:
+        tools-path: tools.csv
+
+    # If we restored the environment, we still need to make R, Pandoc, and chromehtml2pdf available
+    - name: Setup R (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '${{ steps.get-tools-versions.outputs.r }}'
+        use-public-rspm: true
+
+    - name: Setup Pandoc (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      uses: r-lib/actions/setup-pandoc@v2
+
+    - name: Install chromehtml2pdf (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      run: npm install -g chromehtml2pdf
       shell: bash
 
     - id: qualification-environment
+      if: steps.cache-setup.outputs.cache-hit != 'true'
       name: Setup Qualification Environment
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
       with:
         tools-path: tools.csv
 
     - name: Downgrade ggplot2 to 3.5.2
+      if: steps.cache-setup.outputs.cache-hit != 'true'
       run: |
         Rscript -e 'remove.packages("ggplot2")'
         Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
       shell: bash
+
+    # Save the prepared environment so subsequent runs can skip setup
+    - name: Save setup cache
+      if: steps.cache-setup.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ env.SETUP_CACHE_KEY }}
+        path: |
+          ${{ env.R_LIBS_USER }}
+          ${{ github.workspace }}/PK-Sim
+          ${{ github.workspace }}/QualificationRunner
 
     - id: run-qualification
       name: Run qualification
@@ -155,4 +208,3 @@ jobs:
           ## Qualification plans
           ${{ needs.read_inputs.outputs.qualifications_table }}
 #        reviewers: ${{ github.actor }}
-        
