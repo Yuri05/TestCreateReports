@@ -28,42 +28,56 @@ jobs:
       id: cache-setup
       uses: actions/cache@v4
       with:
-        key: Main-${{ env.TOOLS_CSV_HASH }}
+        key: Ronly-Main-${{ env.TOOLS_CSV_HASH }}
         path: |
           ${{ env.R_LIBS_USER }}
-          ${{ github.workspace }}/PK-Sim
-          ${{ github.workspace }}/QualificationRunner
-        enableCrossOsArchive: true
+#          ${{ github.workspace }}/PK-Sim
+#          ${{ github.workspace }}/QualificationRunner
+#        enableCrossOsArchive: true
 
     - id: get-tools-versions
-      name: Get tools versions (for R setup on cached runs)
-      if: steps.cache-setup.outputs.cache-hit == 'true'
+      name: Get tools versions #(for R setup on cached runs)
+      #if: steps.cache-setup.outputs.cache-hit == 'true'
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/get-tools-versions@main
       with:
         tools-path: tools.csv
 
     - name: Setup R (cached run)
-      if: steps.cache-setup.outputs.cache-hit == 'true'
+      #if: steps.cache-setup.outputs.cache-hit == 'true'
       uses: r-lib/actions/setup-r@v2
       with:
         r-version: '${{ steps.get-tools-versions.outputs.r }}'
         use-public-rspm: true
 
-    - name: Setup Pandoc (cached run)
-      if: steps.cache-setup.outputs.cache-hit == 'true'
-      uses: r-lib/actions/setup-pandoc@v2
+    - id: install-cran-packages (no cache)
+      name: Install cran packages
+      run: |
+        # Packages required to remotely install OSPSuite packages
+        install.packages(c("remotes", "pak"))
+#        print("CRAN Packages suggested and required by ospsuite-r")
+#        pak::pkg_install(c('R6','rlang','dplyr','purrr','readr','tidyr','spelling','data.table','tidyselect','openxlsx','xml2'))
+#        print("CRAN Packages suggested and required by tlf")
+#        pak::pkg_install(c('stringr','gridtext','ggtext','showtext','rsvg','svglite','cowplot'))
+#        print("CRAN Packages suggested and required by reporting engine")
+#        pak::pkg_install(c('jsonlite','rmarkdown','knitr','parallel','readxl','Rmpi'))
+#        # Following packages should not be needed c('testthat','covr','pkgdown')
+      shell: Rscript {0}
 
-    - name: Install chromehtml2pdf (cached run)
-      if: steps.cache-setup.outputs.cache-hit == 'true'
-      run: npm install -g chromehtml2pdf
-      shell: bash
+#    - name: Setup Pandoc (cached run)
+#      if: steps.cache-setup.outputs.cache-hit == 'true'
+#      uses: r-lib/actions/setup-pandoc@v2
 
-    - id: qualification-environment
-      name: Setup Qualification Environment
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
-      with:
-        tools-path: tools.csv
+#    - name: Install chromehtml2pdf (cached run)
+#      if: steps.cache-setup.outputs.cache-hit == 'true'
+#      run: npm install -g chromehtml2pdf
+#      shell: bash
+
+#    - id: qualification-environment
+#      name: Setup Qualification Environment
+#      if: steps.cache-setup.outputs.cache-hit != 'true'
+#      uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
+#      with:
+#        tools-path: tools.csv
         
     - name: Debug cached paths before save
       if: steps.cache-setup.outputs.cache-hit != 'true'
@@ -74,8 +88,8 @@ jobs:
         else
           echo "R library directory missing"
         fi
-        echo "PK-Sim dir:"
-        ls -l PK-Sim || echo "PK-Sim missing"
-        echo "QualificationRunner dir:"
+#        echo "PK-Sim dir:"
+#        ls -l PK-Sim || echo "PK-Sim missing"
+#        echo "QualificationRunner dir:"
         ls -l QualificationRunner || echo "QualificationRunner missing"
       shell: bash
