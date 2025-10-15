@@ -33,6 +33,7 @@ jobs:
           ${{ env.R_LIBS_USER }}
           ${{ github.workspace }}/PK-Sim
           ${{ github.workspace }}/QualificationRunner
+        enableCrossOsArchive: true
 
     - id: get-tools-versions
       name: Get tools versions (for R setup on cached runs)
