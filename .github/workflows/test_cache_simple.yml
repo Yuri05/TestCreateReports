@@ -26,7 +26,7 @@ jobs:
       id: cache-setup
       uses: actions/cache@v4
       with:
-        key: Main-${{ env.TOOLS_CSV_HASH }}
+        key: Simple-Main-${{ env.TOOLS_CSV_HASH }}
         path: |
           CachedDir
 
