@@ -70,7 +70,7 @@ jobs:
       run: |
         echo "Listing R library root: $R_LIBS_USER"
         if [ -d "$R_LIBS_USER" ]; then
-          ls -l "$R_LIBS_USER" | head -n 50
+          ls -l "$R_LIBS_USER" 
         else
           echo "R library directory missing"
         fi
