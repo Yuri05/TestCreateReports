@@ -14,7 +14,7 @@ jobs:
   evaluation:
     runs-on: windows-latest
     env:
-      R_LIBS_USER: ${{ github.workspace }}/RLibrary
+      R_LIBS_USER: ${{ github.workspace }}\RLibrary
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
