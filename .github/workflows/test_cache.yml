@@ -36,6 +36,7 @@ jobs:
 
     - id: get-tools-versions
       name: Get tools versions (for R setup on cached runs)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
       uses: Open-Systems-Pharmacology/Workflows/.github/actions/get-tools-versions@main
       with:
         tools-path: tools.csv
