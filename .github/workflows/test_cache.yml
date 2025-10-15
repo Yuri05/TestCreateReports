@@ -63,3 +63,17 @@ jobs:
       with:
         tools-path: tools.csv
         
+    - name: Debug cached paths before save
+      if: steps.cache-setup.outputs.cache-hit != 'true'
+      run: |
+        echo "Listing R library root: $R_LIBS_USER"
+        if [ -d "$R_LIBS_USER" ]; then
+          ls -l "$R_LIBS_USER" | head -n 50
+        else
+          echo "R library directory missing"
+        fi
+        echo "PK-Sim dir:"
+        ls -l PK-Sim || echo "PK-Sim missing"
+        echo "QualificationRunner dir:"
+        ls -l QualificationRunner || echo "QualificationRunner missing"
+      shell: bash
