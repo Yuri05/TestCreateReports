@@ -1,0 +1,51 @@
+name: Test Cache Simple
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+env:
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  evaluation:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Compute tools.csv hash
+      id: compute-tools-hash
+      shell: bash
+      run: echo "TOOLS_CSV_HASH=${{ hashFiles('tools.csv') }}" >> $GITHUB_ENV
+
+    - name: Restore setup cache
+      id: cache-setup
+      uses: actions/cache@v4
+      with:
+        key: Main-${{ env.TOOLS_CSV_HASH }}
+        path: |
+          CachedDir
+
+    - name: Do something (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      run:
+        echo "Tralala"
+      shell: bash
+
+    - id: create-content
+      name: Create Content for Cache
+      run: |
+        mkdir CachedDir
+        echo "Trululu" >> CachedDir/CachedFile.txt
+      shell: bash
+        
+    - name: Debug cached paths before save
+      if: steps.cache-setup.outputs.cache-hit != 'true'
+      run: |
+        echo "CachedDir:"
+        ls -l CachedDir || echo "CachedDir missing"
+      shell: bash
