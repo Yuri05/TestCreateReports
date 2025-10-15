@@ -38,6 +38,7 @@ jobs:
 
     - id: create-content
       name: Create Content for Cache
+      if: steps.cache-setup.outputs.cache-hit != 'true'
       run: |
         mkdir CachedDir
         echo "Trululu" >> CachedDir/CachedFile.txt
