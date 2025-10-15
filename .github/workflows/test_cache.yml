@@ -54,13 +54,13 @@ jobs:
       run: |
         # Packages required to remotely install OSPSuite packages
         install.packages(c("remotes", "pak"))
-#        print("CRAN Packages suggested and required by ospsuite-r")
-#        pak::pkg_install(c('R6','rlang','dplyr','purrr','readr','tidyr','spelling','data.table','tidyselect','openxlsx','xml2'))
-#        print("CRAN Packages suggested and required by tlf")
-#        pak::pkg_install(c('stringr','gridtext','ggtext','showtext','rsvg','svglite','cowplot'))
-#        print("CRAN Packages suggested and required by reporting engine")
-#        pak::pkg_install(c('jsonlite','rmarkdown','knitr','parallel','readxl','Rmpi'))
-#        # Following packages should not be needed c('testthat','covr','pkgdown')
+        #print("CRAN Packages suggested and required by ospsuite-r")
+        #pak::pkg_install(c('R6','rlang','dplyr','purrr','readr','tidyr','spelling','data.table','tidyselect','openxlsx','xml2'))
+        #print("CRAN Packages suggested and required by tlf")
+        #pak::pkg_install(c('stringr','gridtext','ggtext','showtext','rsvg','svglite','cowplot'))
+        #print("CRAN Packages suggested and required by reporting engine")
+        #pak::pkg_install(c('jsonlite','rmarkdown','knitr','parallel','readxl','Rmpi'))
+        ## Following packages should not be needed c('testthat','covr','pkgdown')
       shell: Rscript {0}
 
 #    - name: Setup Pandoc (cached run)
@@ -88,8 +88,8 @@ jobs:
         else
           echo "R library directory missing"
         fi
-#        echo "PK-Sim dir:"
-#        ls -l PK-Sim || echo "PK-Sim missing"
-#        echo "QualificationRunner dir:"
+        #echo "PK-Sim dir:"
+        #ls -l PK-Sim || echo "PK-Sim missing"
+        #echo "QualificationRunner dir:"
         ls -l QualificationRunner || echo "QualificationRunner missing"
       shell: bash
