@@ -1,0 +1,52 @@
+name: Test Cache R
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+env:
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  evaluation:
+    runs-on: windows-latest
+    env:
+      R_LIBS_USER: ${{ github.workspace }}\RLibrary
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Restore setup cache
+      id: cache-setup
+      uses: actions/cache@v4
+      with:
+        key: Ronly-Main-123456789
+        path: |
+          ${{ env.R_LIBS_USER }}
+
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '4.3.1'
+        use-public-rspm: true
+        rtools-version: 'none'
+
+    - id: install-cran-packages
+      name: Install cran packages (NO CACHE FOUND)
+      run: |
+        install.packages(c("remotes", "pak"))
+      shell: Rscript {0}
+
+    - name: Debug cached paths before save
+      if: steps.cache-setup.outputs.cache-hit != 'true'
+      run: |
+        echo "Listing R library root: $R_LIBS_USER"
+        if [ -d "$R_LIBS_USER" ]; then
+          ls -l "$R_LIBS_USER" 
+        else
+          echo "R library directory missing"
+        fi
+      shell: bash
