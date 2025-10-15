@@ -4,14 +4,77 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  actions: write
+
+env:
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  info:
-    runs-on: ubuntu-latest
+  evaluation:
+    runs-on: windows-latest
+    env:
+      R_LIBS_USER: ${{ github.workspace }}/RLibrary
     steps:
-    - name: Info
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Compute tools.csv hash
+      id: compute-tools-hash
+      shell: bash
+      run: echo "TOOLS_CSV_HASH=${{ hashFiles('tools.csv') }}" >> $GITHUB_ENV
+
+    - name: Restore setup cache
+      id: cache-setup
+      uses: actions/cache@v4
+      with:
+        key: Main-${{ env.TOOLS_CSV_HASH }}
+        path: |
+          ${{ env.R_LIBS_USER }}
+          ${{ github.workspace }}/PK-Sim
+          ${{ github.workspace }}/QualificationRunner
+
+    - id: get-tools-versions
+      name: Get tools versions (for R setup on cached runs)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      uses: Open-Systems-Pharmacology/Workflows/.github/actions/get-tools-versions@main
+      with:
+        tools-path: tools.csv
+
+    - name: Setup R (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '${{ steps.get-tools-versions.outputs.r }}'
+        use-public-rspm: true
+
+    - name: Setup Pandoc (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      uses: r-lib/actions/setup-pandoc@v2
+
+    - name: Install chromehtml2pdf (cached run)
+      if: steps.cache-setup.outputs.cache-hit == 'true'
+      run: npm install -g chromehtml2pdf
+      shell: bash
+
+    - id: qualification-environment
+      name: Setup Qualification Environment
+      if: steps.cache-setup.outputs.cache-hit != 'true'
+      uses: Open-Systems-Pharmacology/Workflows/.github/actions/setup-qualification-environment@main
+      with:
+        tools-path: tools.csv
+        
+    - name: Debug cached paths before save
+      if: steps.cache-setup.outputs.cache-hit != 'true'
       run: |
-        echo "Don't run from the main branch"
+        echo "Listing R library root: $R_LIBS_USER"
+        if [ -d "$R_LIBS_USER" ]; then
+          ls -l "$R_LIBS_USER" | head -n 50
+        else
+          echo "R library directory missing"
+        fi
+        echo "PK-Sim dir:"
+        ls -l PK-Sim || echo "PK-Sim missing"
+        echo "QualificationRunner dir:"
+        ls -l QualificationRunner || echo "QualificationRunner missing"
       shell: bash
