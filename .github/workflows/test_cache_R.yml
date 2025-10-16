@@ -14,16 +14,16 @@ jobs:
   evaluation:
     runs-on: windows-latest
     env:
-      R_LIBS_USER: ${{ github.workspace }}\RLibrary
+      DEFAULT_R_LIBS_USER: ${{ github.workspace }}\RLibrary
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: R_LIBS_USER before restore cache
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      run: |
-        echo "R_LIBS_USER = $R_LIBS_USER"
-      shell: bash
+#    - name: R_LIBS_USER before restore cache
+#      if: steps.cache-setup.outputs.cache-hit != 'true'
+#      run: |
+#        echo "R_LIBS_USER = $R_LIBS_USER"
+#      shell: bash
       
     - name: Restore setup cache
       id: cache-setup
@@ -33,11 +33,11 @@ jobs:
         path: |
           ${{ env.R_LIBS_USER }}
     
-    - name: R_LIBS_USER before install R
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      run: |
-        echo "R_LIBS_USER = $R_LIBS_USER"
-      shell: bash
+#    - name: R_LIBS_USER before install R
+#      if: steps.cache-setup.outputs.cache-hit != 'true'
+#      run: |
+#        echo "R_LIBS_USER = $R_LIBS_USER"
+#      shell: bash
       
     - name: Setup R
       uses: r-lib/actions/setup-r@v2
@@ -51,7 +51,17 @@ jobs:
       run: |
         echo "R_LIBS_USER = $R_LIBS_USER"
       shell: bash
+
+    - name: reset R_LIBS_USER to default
+      shell: bash
+      run: echo "R_LIBS_USER=$DEFAULT_R_LIBS_USER" >> $GITHUB_ENV
       
+    - name: R_LIBS_USER after setting to default
+      if: steps.cache-setup.outputs.cache-hit != 'true'
+      run: |
+        echo "R_LIBS_USER = $R_LIBS_USER"
+      shell: bash
+
     - id: install-cran-packages
       name: Install cran packages (NO CACHE FOUND)
       run: |
