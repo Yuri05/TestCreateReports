@@ -34,7 +34,7 @@ jobs:
         use-public-rspm: true
         rtools-version: 'none'
 
-    - name: reset R_LIBS_USER to default
+    - name: SET R_LIBS_USER
       shell: bash
       run: echo "R_LIBS_USER=${DEFAULT_R_LIBS_USER//\\//}" >> $GITHUB_ENV
       
@@ -47,6 +47,7 @@ jobs:
       name: Install cran packages (NO CACHE FOUND)
       if: steps.cache-setup.outputs.cache-hit != 'true'
       run: |
+        dir.create("${{ env.R_LIBS_USER }}", recursive = TRUE)
         install.packages(c("remotes", "pak"), lib = "${{ env.R_LIBS_USER }}")
       shell: Rscript {0}
 
