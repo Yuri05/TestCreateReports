@@ -46,34 +46,34 @@ jobs:
         use-public-rspm: true
         rtools-version: 'none'
 
-    - name: R_LIBS_USER after install R
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      run: |
-        echo "R_LIBS_USER = $R_LIBS_USER"
-      shell: bash
+#    - name: R_LIBS_USER after install R
+#      if: steps.cache-setup.outputs.cache-hit != 'true'
+#      run: |
+#        echo "R_LIBS_USER = $R_LIBS_USER"
+#      shell: bash
 
-    - name: reset R_LIBS_USER to default
-      shell: bash
-      run: echo "R_LIBS_USER=$DEFAULT_R_LIBS_USER" >> $GITHUB_ENV
+#    - name: reset R_LIBS_USER to default
+#      shell: bash
+#      run: echo "R_LIBS_USER=$DEFAULT_R_LIBS_USER" >> $GITHUB_ENV
       
-    - name: R_LIBS_USER after setting to default
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      run: |
-        echo "R_LIBS_USER = $R_LIBS_USER"
-      shell: bash
+#    - name: R_LIBS_USER after setting to default
+#      if: steps.cache-setup.outputs.cache-hit != 'true'
+#      run: |
+#        echo "R_LIBS_USER = $R_LIBS_USER"
+#      shell: bash
 
     - id: install-cran-packages
       name: Install cran packages (NO CACHE FOUND)
       run: |
-        install.packages(c("remotes", "pak"))
+        install.packages(c("remotes", "pak"), lib = ${{ env.DEFAULT_R_LIBS_USER }})
       shell: Rscript {0}
 
     - name: Debug cached paths before save
       if: steps.cache-setup.outputs.cache-hit != 'true'
       run: |
-        echo "Listing R library root: $R_LIBS_USER"
-        if [ -d "$R_LIBS_USER" ]; then
-          ls -l "$R_LIBS_USER" 
+        echo "Listing R library root: $DEFAULT_R_LIBS_USER"
+        if [ -d "$DEFAULT_R_LIBS_USER" ]; then
+          ls -l "$DEFAULT_R_LIBS_USER" 
         else
           echo "R library directory missing"
         fi
