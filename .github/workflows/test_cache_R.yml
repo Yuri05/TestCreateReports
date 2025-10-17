@@ -23,16 +23,16 @@ jobs:
       id: cache-setup
       uses: actions/cache@v4
       with:
-        key: Ronly-Main-123456789
+        key: SkipR-Main-123456789
         path: |
           ${{ env.DEFAULT_R_LIBS_USER }}
     
-    - name: Setup R
-      uses: r-lib/actions/setup-r@v2
-      with:
-        r-version: '4.3.1'
-        use-public-rspm: true
-        rtools-version: 'none'
+#    - name: Setup R
+#      uses: r-lib/actions/setup-r@v2
+#      with:
+#        r-version: '4.3.1'
+#        use-public-rspm: true
+#        rtools-version: 'none'
 
     - name: SET R_LIBS_USER
       shell: bash
