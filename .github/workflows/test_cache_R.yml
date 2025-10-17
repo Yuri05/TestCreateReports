@@ -48,7 +48,7 @@ jobs:
       if: steps.cache-setup.outputs.cache-hit != 'true'
       run: |
         dir.create("${{ env.R_LIBS_USER }}", recursive = TRUE)
-        install.packages(c("remotes", "pak"), lib = "${{ env.R_LIBS_USER }}")
+        install.packages(c("remotes", "pak"), lib = "${{ env.R_LIBS_USER }}", repos = "https://cloud.r-project.org")
       shell: Rscript {0}
 
     - name: Debug cached paths before save
