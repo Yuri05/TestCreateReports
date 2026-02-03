@@ -2,7 +2,7 @@
 
 | Version                                         | master-OSP12.1                                                   |
 | ----------------------------------------------- | ------------------------------------------------------------ |
-| based on *Model Snapshot* and *Evaluation Plan* | https://github.com/Open-Systems-Pharmacology/Moxidectin-Model/releases/tag/vmaster |
+| based on *Model Snapshot* and *Evaluation Plan* |  |
 | OSP Version                                     | 12.1                                                          |
 | Qualification Framework Version                 | 3.4                                                          |
 
