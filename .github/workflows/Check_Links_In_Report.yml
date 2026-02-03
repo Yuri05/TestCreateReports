@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  REPORT_PATH: Evaluation/report
+  REPORT_PATH: Moxidectin
 
 jobs:
   check-folder:
