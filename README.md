@@ -8,7 +8,9 @@
 
 - Create a new branch (e.g. `my-reports`) from the `main` branch of your fork.
   - Define the models by updating [`models.csv`](models.csv) (see the [Models](#models) section below for details)
+    - Once you are finished, verify that the check [Validate models.csv](../../actions/workflows/check-models.yml) was successful!
   - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(see the [Tools](#tools) section below for details)
+    - In case of modifications: verify that the check [Validate tools.csv](../../actions/workflows/check-tools.yml) was successful!
   - Go to the GitHub Action: [Create evaluation reports and projects](../../actions/workflows/create-evaluation_reports.yml)<br><br>
     - Click the __Run workflow__ button 
       - Select the branch defined in the first step (for instance, `my-reports`)
@@ -21,7 +23,9 @@
 
 - Create a new branch (e.g. `my-reports`) from the `main` branch of your fork.
   - Define the qualifications by updating [`qualifications.csv`](qualifications.csv) (see the [Qualifications](#qualifications) section below for details)
+    - Once you are finished, verify that the check [Validate qualifications.csv](../../actions/workflows/check-qualifications.yml) was successful!
   - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(see the [Tools](#tools) section below for details)
+    - In case of modifications: verify that the check [Validate tools.csv](../../actions/workflows/check-tools.yml) was successful!
   - Go to the GitHub Action: [Qualification Reports](../../actions/workflows/create-qualification_reports.yml)<br><br>
     - Click the __Run workflow__ button 
       - Select the branch defined in the first step (for instance, `my-reports`)
