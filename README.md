@@ -1,6 +1,12 @@
+# Creation of Model Evaluation / Qualification reports directly on GitHub
+
+## Preparation
+* Fork this repository into your GitHub user account (if not yet happened).
+* [OPTIONAL] Synchronise the main branch of the repository with the parent OSP repositoryif required <br>(s. [Syncing a fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) in the GitHub documentation for details).
+
 ## How to create model evaluation reports
 
-- Create a new branch (e.g. `my-reports`) from the `main` branch of the repository.
+- Create a new branch (e.g. `my-reports`) from the `main` branch of your fork.
   - Define the models by updating [`models.csv`](models.csv) (s. the [Models](#models) section below for details)
   - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(s. the [Tools](#tools) section below for details)
   - Go to the GitHub Action: [Create evaluation reports and projects](../../actions/workflows/create-evaluation_reports.yml)<br><br>
@@ -13,7 +19,7 @@
 
 ## How to create qualification reports
 
-- Create a new branch (e.g. `my-reports`) from the `main` branch of the repository.
+- Create a new branch (e.g. `my-reports`) from the `main` branch of your fork.
   - Define the qualifications by updating [`qualifications.csv`](qualifications.csv) (s. the [Qualifications](#qualifications) section below for details)
   - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(s. the [Tools](#tools) section below for details)
   - Go to the GitHub Action: [Qualification Reports](../../actions/workflows/create-qualification_reports.yml)<br><br>
@@ -24,8 +30,11 @@
 
 ## What to do when reports are created<a id="next-step"></a>
 
-When the qualification reports are created, pull requests are triggered (one pull request for each qualification report) toward the branch defined in the first step (for instance, `my-reports`).<br>
+When the qualification reports are created, pull requests (PR) are created (one PR for each qualification report) toward the branch defined in the first step (for instance, `my-reports`).<br>
 The pull requests will allow users to review the updates in the reports and adopt the new version.
+For each created PR:
+* Close and reopen the PR: this will trigger the automated checks (e.g. links and cross-references) of the created report.
+* If you have a GitHub Copilot license: assign Copilot as PR reviewer (Copilot will then check the report as well)
 
 ## Models
 
