@@ -2,12 +2,11 @@
 
 - Create a new branch (e.g. `my-reports`) from the `main` branch of the repository.
   - Define the models by updating [`models.csv`](models.csv) (s. the [Models](#models) section below for details)
-  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv) (s. the [Tools](#tools) section below for details)
+  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(s. the [Tools](#tools) section below for details)
   - Go to the GitHub Action: [Create evaluation reports and projects](../../actions/workflows/create-evaluation_reports.yml)<br><br>
     - Click on the button __Run workflow__ 
       - Select your branch defined in the first step (for instance, `my-reports`)
-      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request
-        (s. [below](#next-step))
+      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request<br>(s. the [What to do when reports are created](#next-step) section below).
       - Click on the green button __Run workflow__
         
         <img width="800" src="https://github.com/user-attachments/assets/863a98cd-ecff-43c5-8ed9-b1458becf48c" />
@@ -16,11 +15,11 @@
 
 - Create a new branch (e.g. `my-reports`) from the `main` branch of the repository.
   - Define the qualifications by updating [`qualifications.csv`](qualifications.csv) (s. the [Qualifications](#qualifications) section below for details)
-  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv) (s. the [Tools](#tools) section below for details)
+  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(s. the [Tools](#tools) section below for details)
   - Go to the GitHub Action: [Qualification Reports](../../actions/workflows/create-qualification_reports.yml)<br><br>
     - Click on the button __Run workflow__ 
       - Select your branch defined in the first step (for instance, `my-reports`)
-      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request
+      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request<br>(s. the [What to do when reports are created](#next-step) section below).
         (s. [below](#next-step))
       - Click on the green button __Run workflow__ 
 
