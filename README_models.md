@@ -25,7 +25,7 @@ The header includes the following fields:
 - __Execute__: If `TRUE` run the qualification. If `FALSE`, skip the qualification.
 - __Repository name__: Name of Github OSP repository from which to get the model, e.g. `7E3-Model` for [7E3-Model](https://github.com/Open-Systems-Pharmacology/7E3-Model)
 - __Released version__: Tag version of the model, e.g. `1.0`
-- __Snapshot name__: Name of the snapshot (`.json`) file, e.g. `7E3` for [7E3.json](https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json)
+- __Snapshot name__: Name of the snapshot (`.json`) file, e.g. `7E3` for [7E3.json](https://github.com/Open-Systems-Pharmacology/7E3-Model/blob/v1.0/7E3.json)
 - __Workflow name__: Path of workflow R script that creates the function to run the qualification if not default.
 > [!TIP]
 > Leave blank cell if default path, `evaluation/workflow.R`, is used (this path is case insensitive). 
