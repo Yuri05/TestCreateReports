@@ -33,9 +33,9 @@ The [`models.csv`](models.csv) file indicates which models should be run and qua
 The header includes the following fields:
 
 - __Execute__: If `TRUE` run the qualification. If `FALSE`, skip the qualification.
-- __Repository name__: Name of GitHub OSP repository from which to get the model, e.g. `7E3-Model` for <br>[https://github.com/Open-Systems-Pharmacology/7E3-Model](https://github.com/Open-Systems-Pharmacology/7E3-Model)
+- __Repository name__: Name of GitHub OSP repository from which to get the model, e.g. <br>`7E3-Model` for [https://github.com/Open-Systems-Pharmacology/7E3-Model](https://github.com/Open-Systems-Pharmacology/7E3-Model)
 - __Released version__: Tag version of the model repository release, e.g. `1.0`. Alternatively, a branch name (e.g. `main`).
-- __Snapshot name__: Name of the snapshot (`.json`) file, e.g. `7E3` for <br>[https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json](https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json)
+- __Snapshot name__: Name of the snapshot (`.json`) file, e.g. <br>`7E3` for [https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json](https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json)
 - __Folder name__: Name of the target folder where the model evaluation report (and the project file(s)) should be created.
 - __Workflow name__: Path of workflow R script that creates the function to run the qualification if not default.
 > [!TIP]
