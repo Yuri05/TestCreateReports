@@ -1,55 +1,55 @@
-# Creation of Model Evaluation / Qualification reports directly on GitHub
+# Creation of Model Evaluation / Qualification Reports directly on GitHub
 
 ## Preparation
-* Fork this repository into your GitHub user account (if not yet happened).
-* [OPTIONAL] Synchronise the main branch of the repository with the parent OSP repositoryif required <br>(s. [Syncing a fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) in the GitHub documentation for details).
+* Fork this repository into your GitHub user account (if you have not done so yet).
+* [OPTIONAL] Synchronize the `main` branch of your fork with the parent OSP repository if required <br>(see [Syncing a fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) in the GitHub documentation for details).
 
 ## How to create model evaluation reports
 
 - Create a new branch (e.g. `my-reports`) from the `main` branch of your fork.
-  - Define the models by updating [`models.csv`](models.csv) (s. the [Models](#models) section below for details)
-  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(s. the [Tools](#tools) section below for details)
+  - Define the models by updating [`models.csv`](models.csv) (see the [Models](#models) section below for details)
+  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(see the [Tools](#tools) section below for details)
   - Go to the GitHub Action: [Create evaluation reports and projects](../../actions/workflows/create-evaluation_reports.yml)<br><br>
-    - Click on the button __Run workflow__ 
-      - Select your branch defined in the first step (for instance, `my-reports`)
-      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request<br>(s. the [What to do when reports are created](#next-step) section below).
-      - Click on the green button __Run workflow__
+    - Click the __Run workflow__ button 
+      - Select the branch defined in the first step (for instance, `my-reports`)
+      - [OPTIONAL] Adjust the commit message that will appear later in the created pull request<br>(see the [What to do when reports are created](#next-step) section below).
+      - Click the green __Run workflow__ button
         
         <img width="800" src="https://github.com/user-attachments/assets/863a98cd-ecff-43c5-8ed9-b1458becf48c" />
 
 ## How to create qualification reports
 
 - Create a new branch (e.g. `my-reports`) from the `main` branch of your fork.
-  - Define the qualifications by updating [`qualifications.csv`](qualifications.csv) (s. the [Qualifications](#qualifications) section below for details)
-  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(s. the [Tools](#tools) section below for details)
+  - Define the qualifications by updating [`qualifications.csv`](qualifications.csv) (see the [Qualifications](#qualifications) section below for details)
+  - [OPTIONAL] Adjust the OSP environment and tools by updating [`tools.csv`](tools.csv)<br>(see the [Tools](#tools) section below for details)
   - Go to the GitHub Action: [Qualification Reports](../../actions/workflows/create-qualification_reports.yml)<br><br>
-    - Click on the button __Run workflow__ 
-      - Select your branch defined in the first step (for instance, `my-reports`)
-      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request<br>(s. the [What to do when reports are created](#next-step) section below).
-      - Click on the green button __Run workflow__ 
+    - Click the __Run workflow__ button 
+      - Select the branch defined in the first step (for instance, `my-reports`)
+      - [OPTIONAL] Adjust the commit message that will appear later in the created pull request<br>(see the [What to do when reports are created](#next-step) section below).
+      - Click the green __Run workflow__ button 
 
 ## What to do when reports are created<a id="next-step"></a>
 
-When the qualification reports are created, pull requests (PR) are created (one PR for each qualification report) toward the branch defined in the first step (for instance, `my-reports`).<br>
-The pull requests will allow users to review the updates in the reports and adopt the new version.
+When qualification reports are created, pull requests (PRs) are created (one PR for each qualification report) toward the branch defined in the first step (for instance, `my-reports`).<br>
+These pull requests allow users to review report updates and adopt the new version.
 For each created PR:
 * Close and reopen the PR: this will trigger the automated checks (e.g. links and cross-references) of the created report.
-* If you have a GitHub Copilot license: assign Copilot as PR reviewer (Copilot will then check the report as well)
+* If you have a GitHub Copilot license: assign Copilot as a PR reviewer (Copilot will then check the report as well)
 
 ## Models
 
 The [`models.csv`](models.csv) file indicates which models should be run and qualified.
 The header includes the following fields:
 
-- __Execute__: If `TRUE` run the qualification. If `FALSE`, skip the qualification.
-- __Repository name__: Name of GitHub OSP repository from which to get the model, e.g. <br>`7E3-Model` for [https://github.com/Open-Systems-Pharmacology/7E3-Model](https://github.com/Open-Systems-Pharmacology/7E3-Model)
-- __Released version__: Tag version of the model repository release, e.g. `1.0`. <br>Alternatively, a **branch** name of the model repository (e.g. `main`).
-- __Snapshot name__: Name of the snapshot (`.json`) file, e.g. <br>`7E3` for [https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json](https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json)
+- __Execute__: If `TRUE`, run the qualification. If `FALSE`, skip the qualification.
+- __Repository name__: Name of the GitHub OSP repository from which to get the model, e.g. <br>`7E3-Model` for [https://github.com/Open-Systems-Pharmacology/7E3-Model](https://github.com/Open-Systems-Pharmacology/7E3-Model)
+- __Released version__: Tag version of the model repository release, e.g. `1.0`. <br>Alternatively, use a **branch** name of the model repository (e.g. `main`).
+- __Snapshot name__: Name of the snapshot (`.json`) file, e.g. <br>`7E3` in [https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json](https://github.com/Open-Systems-Pharmacology/7E3-Model/7E3.json)
 - __Folder name__: Name of the target folder where the model evaluation report (and the project file(s)) should be created.
-- __Workflow name__: Path of workflow R script that creates the function to run the qualification if not default.
+- __Workflow name__: Path of the workflow R script that creates the function to run the qualification if not default.
 > [!TIP]
-> Leave blank cell if default path, `evaluation/workflow.R`, is used (this path is case insensitive). 
-- __Additional projects__: Url(s) of additional project snapshots to export as `pksim5` projects, e.g. `Propofol-Pediatrics/refs/tags/v1.0/Propofol-Pediatrics.json`
+> Leave the cell blank if the default path, `evaluation/workflow.R`, is used (this path is case insensitive). 
+- __Additional projects__: URL(s) of additional project snapshots to export as `pksim5` projects, e.g. `Propofol-Pediatrics/refs/tags/v1.0/Propofol-Pediatrics.json`
 > [!TIP]
 > If multiple projects are exported, they need to be separated by a pipe character: `|`, e.g. `X-Pediatrics.json|Y-Pediatrics.json`
 
@@ -58,27 +58,27 @@ The header includes the following fields:
 The [`qualifications.csv`](qualifications.csv) file indicates which qualification plans should be processed.
 The header includes the following fields:
 
-- __Execute__: If `TRUE` run the qualification. If `FALSE`, skip the qualification.
+- __Execute__: If `TRUE`, run the qualification. If `FALSE`, skip the qualification.
 - __Repository name__: Name of GitHub OSP repository from which to get the qualification plan, e.g. `Qualification-CKD` for <br>[https://github.com/Open-Systems-Pharmacology/Qualification-CKD](https://github.com/Open-Systems-Pharmacology/Qualification-CKD)
-- __Released version__: Tag version of the qualificaion plan repository release, e.g. `1.0`. <br>Alternatively, a **branch** name of the qualificaion plan repository (e.g. `main`).
-- __Workflow name__: Path of workflow R script that creates the function to run the qualification if not default.
+- __Released version__: Tag version of the qualification plan repository release, e.g. `1.0`. <br>Alternatively, use a **branch** name of the qualification plan repository (e.g. `main`).
+- __Workflow name__: Path of the workflow R script that creates the function to run the qualification if not default.
 > [!TIP]
-> Leave blank cell if default path, `Qualification/workflow.R`, is used (this path is case insensitive).
+> Leave the cell blank if the default path, `Qualification/workflow.R`, is used (this path is case insensitive).
 - __Folder name__: Name of the target folder where the qualification report should be created.
  
 ## Tools 
 
-The [`tools.csv`](tools.csv) file indicates software and software versions to be installed in environment before running the qualifications of the models.
-If a link is defined in the `URL` column, the installation will use the software from the link as is instead of searching from the version.
+The [`tools.csv`](tools.csv) file indicates the software and versions to be installed in the environment before running model qualifications.
+If a link is defined in the `URL` column, the installation uses the software from that link as is instead of resolving from the version.
 Please ensure compatibility between their versions.
-The following available tools to installed are detailed below:
+The available tools to be installed are listed below:
 
-- [__ospsuite-R__](https://www.open-systems-pharmacology.org/OSPSuite-R/) : R package providing the functionality of loading, manipulating, and simulating the simulations created in the Open Systems Pharmacology Software tools PK-Sim and MoBi.
+- [__ospsuite-R__](https://www.open-systems-pharmacology.org/OSPSuite-R/) : R package providing functionality for loading, manipulating, and simulating models created in the Open Systems Pharmacology Software tools PK-Sim and MoBi.
 - [__Reporting Engine__](https://www.open-systems-pharmacology.org/OSPSuite.ReportingEngine/): R package providing a framework in R to design and create reports evaluating PBPK models developed in the Open Systems Pharmacology ecosystem.
-- [__RUtils__](https://www.open-systems-pharmacology.org/OSPSuite.RUtils/): R package providing utility functions for Open Systems Pharmacology R Packages
+- [__RUtils__](https://www.open-systems-pharmacology.org/OSPSuite.RUtils/): R package providing utility functions for Open Systems Pharmacology R packages
 - [__TLF__](https://www.open-systems-pharmacology.org/TLF-Library/): R package providing an object-oriented framework to create tables and figures, which are used by R packages in the Open Systems Pharmacology ecosystem
 - [DEPRECATED __rClr__](https://github.com/Open-Systems-Pharmacology/rClr): R package for accessing .NET. This package has been deprecated in favor of `{rSharp}`.
-- [__rSharp__](https://www.open-systems-pharmacology.org/rSharp/): R package providing access to .NET libraries from R. It allows to create .NET objects, access their fields, and call their methods
-- [__Qualification Runner__](https://github.com/Open-Systems-Pharmacology/QualificationRunner): Qualification runner in charge of managing a qualification workflow
-- [__Qualification Framework__](https://docs.open-systems-pharmacology.org/shared-tools-and-example-workflows/qualification): Enables an automated validation of various scenarios (use-cases) supported by the OSP platform
+- [__rSharp__](https://www.open-systems-pharmacology.org/rSharp/): R package providing access to .NET libraries from R. It allows users to create .NET objects, access their fields, and call their methods
+- [__Qualification Runner__](https://github.com/Open-Systems-Pharmacology/QualificationRunner): Qualification runner responsible for managing a qualification workflow
+- [__Qualification Framework__](https://docs.open-systems-pharmacology.org/shared-tools-and-example-workflows/qualification): Enables automated validation of various scenarios (use-cases) supported by the OSP platform
 - [__PK-Sim__](https://github.com/Open-Systems-Pharmacology/PK-Sim): Portable version of the comprehensive software tool for whole-body physiologically based pharmacokinetic modeling
