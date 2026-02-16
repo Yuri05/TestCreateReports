@@ -8,17 +8,19 @@ name: Validate tools.csv
 on:
   workflow_dispatch:
   push:
-#    branches:
-#      - main
+    paths:
+      - tools.csv
+      - .github/workflows/check-tools.yml
+      - .github/workflows/check-tools.py
 
 jobs:
   validate-tools:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 

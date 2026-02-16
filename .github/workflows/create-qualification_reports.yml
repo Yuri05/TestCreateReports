@@ -17,7 +17,18 @@ env:
   GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validate source branch
+      run: |
+        if [ "${{ github.ref_name }}" = "main" ]; then
+          echo "::error::Please call the workflow not from the main branch"
+          exit 1
+        fi
+
   read_inputs:
+    needs: check-branch
     runs-on: ubuntu-latest
     outputs:
       tools_table: ${{ steps.tools_table.outputs.tools-table }}
@@ -27,7 +38,7 @@ jobs:
       qualifications: ${{steps.qualifications.outputs.data}}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     
     - id: tools_table
       name: Get tools table
@@ -78,17 +89,17 @@ jobs:
       R_LIBS_USER: ${{ github.workspace }}/RLibrary
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     
-#    - name: Rebase from main
+#    - name: Rebase from the base branch
 #      run: |
 #        git config --global core.longpaths true
 #        git config --global user.name 'github-actions'
 #        git config --global user.email 'github-actions@github.com'
 #        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
 #        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
-#        git fetch origin main
-#        git rebase -Xours origin/main
+#        git fetch origin ${{ github.ref_name }}
+#        git rebase -Xours origin/${{ github.ref_name }}
 #        if git rev-parse HEAD^ >/dev/null 2>&1; then
 #          git reset HEAD^
 #        else
@@ -102,7 +113,7 @@ jobs:
     # Restore previously prepared environment if tools.csv was unchanged
     - name: Restore setup cache
       id: cache-setup
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         key: ospsuite-${{ hashFiles('tools.csv') }}
         path: |
@@ -151,7 +162,7 @@ jobs:
     # Save the prepared environment so subsequent runs can skip setup
     - name: Save setup cache
       if: steps.cache-setup.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ospsuite-${{ hashFiles('tools.csv') }}
         path: |
@@ -187,13 +198,10 @@ jobs:
       shell: Rscript {0}
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v7
+      uses: peter-evans/create-pull-request@v8
       with:
-        # Use a custom PAT because GITHUB_TOKEN cannot trigger subsequent workflows (here: required checks on pull_request).
-        # S. https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
-#        token: ${{ secrets.PAT_PR_TRIGGERED_BY_ACTIONS }}
         branch: ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        base: main
+        base: ${{ github.ref_name }}
         commit-message: ${{ inputs.commit-message }}
         add-paths: |
             ${{ matrix['Folder name'] }}/images/**
@@ -205,4 +213,3 @@ jobs:
           ${{ needs.read_inputs.outputs.tools_table }}
           ## Qualification plans
           ${{ needs.read_inputs.outputs.qualifications_table }}
-#        reviewers: ${{ github.actor }}

@@ -2,8 +2,6 @@ name: Check links/cross-references in reports
 
 on: 
   pull_request:
-    branches:
-      - main
  
 jobs:
   find-modified-folders:
@@ -12,7 +10,7 @@ jobs:
       folders: ${{ steps.get-folders.outputs.folders }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
