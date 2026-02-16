@@ -1,8 +1,8 @@
-# Creation of Model Evaluation / Qualification Reports Directly on GitHub
+# Creation of Model Evaluation / Qualification Reports directly on GitHub
 
 ## Preparation
 * Fork this repository into your GitHub user account (if you have not done so yet).
-* [OPTIONAL] Synchronize the `main` branch of this repository with the parent OSP repository if required <br>(see [Syncing a fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) in the GitHub documentation for details).
+* [OPTIONAL] Synchronize the `main` branch of your fork with the parent OSP repository if required <br>(see [Syncing a fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) in the GitHub documentation for details).
 
 ## How to create model evaluation reports
 
@@ -38,7 +38,7 @@ For each created PR:
 
 ## Models
 
-The [`models.csv`](models.csv) file indicates which models should be run and evaluated.
+The [`models.csv`](models.csv) file indicates which models should be run and qualified.
 The header includes the following fields:
 
 - __Execute__: If `TRUE`, run the qualification. If `FALSE`, skip the qualification.
