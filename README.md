@@ -3,7 +3,7 @@
 - Create a new branch from the `main` branch (for instance, `my-reports`)
   - Define the models by updating `models.csv` (s. the [Models](#models) section below for details)
   - [OPTIONAL] Adjust the OSP environment and tools by updating `tools.csv` (s. the [Tools](#tools) section below for details)
-  - Go to the Github Action: [Create evaluation reports and projects](actions/workflows/create-evaluation_reports.yml)
+  - Go to the Github Action: [Create evaluation reports and projects](../../actions/workflows/create-evaluation_reports.yml)
     - Click on the button __Run workflow__ 
       - Select your branch (for instance, `my-reports`)
       - Click on the green button __Run workflow__ 
@@ -13,7 +13,7 @@
 - Create a new branch from the `main` branch (for instance, `my-reports`)
   - Define the qualifications by updating `qualifications.csv` (s. the [Qualifications](#qualifications) section below for details)
   - [OPTIONAL] Adjust the OSP environment and tools by updating `tools.csv` (s. the [Tools](#tools) section below for details)
-  - Go to the Github Action: [Qualification Reports](actions/workflows/create-qualification_reports.yml)
+  - Go to the Github Action: [Qualification Reports](../../actions/workflows/create-qualification_reports.yml)
     - Click on the button __Run workflow__ 
       - Select your branch defined in the first step (for instance, `my-reports`)
       - Click on the green button __Run workflow__ 
