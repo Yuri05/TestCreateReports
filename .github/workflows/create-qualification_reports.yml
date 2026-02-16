@@ -17,7 +17,18 @@ env:
   GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validate source branch
+      run: |
+        if [ "${{ github.ref_name }}" = "main" ]; then
+          echo "::error::Please call the workflow not from the main branch"
+          exit 1
+        fi
+
   read_inputs:
+    needs: check-branch
     runs-on: ubuntu-latest
     outputs:
       tools_table: ${{ steps.tools_table.outputs.tools-table }}
@@ -80,24 +91,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-#    - name: Rebase from main
-#      run: |
-#        git config --global core.longpaths true
-#        git config --global user.name 'github-actions'
-#        git config --global user.email 'github-actions@github.com'
-#        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
-#        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
-#        git fetch origin main
-#        git rebase -Xours origin/main
-#        if git rev-parse HEAD^ >/dev/null 2>&1; then
-#          git reset HEAD^
-#        else
-#          echo "No parent commit for HEAD. Skipping reset."
-#        fi
-#        [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
-#        git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
-#        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
-#      shell: bash
+    - name: Rebase from main
+      run: |
+        git config --global core.longpaths true
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git checkout -b ${{ matrix['Repository name'] }}-${{ github.run_number }}
+        git push -u origin ${{ matrix['Repository name'] }}-${{ github.run_number }}
+        git fetch origin ${{ github.ref_name }}
+        git rebase -Xours origin/${{ github.ref_name }}
+        if git rev-parse HEAD^ >/dev/null 2>&1; then
+          git reset HEAD^
+        else
+          echo "No parent commit for HEAD. Skipping reset."
+        fi
+        [ -d "${{ matrix['Folder name'] }}" ] && rm -rf ${{ matrix['Folder name'] }}/*
+        git add ${{ matrix['Folder name'] }} || echo "No file in ${{ matrix['Folder name'] }}"
+        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
+      shell: bash
 
     # Restore previously prepared environment if tools.csv was unchanged
     - name: Restore setup cache

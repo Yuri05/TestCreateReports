@@ -8,8 +8,10 @@ name: Validate tools.csv
 on:
   workflow_dispatch:
   push:
-#    branches:
-#      - main
+    paths:
+      - tools.csv
+      - .github/workflows/check-tools.yml
+      - .github/workflows/check-tools.py
 
 jobs:
   validate-tools:

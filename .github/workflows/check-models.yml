@@ -12,8 +12,10 @@ name: Validate models.csv
 on:
   workflow_dispatch:
   push:
-#    branches:
-#      - main
+    paths:
+      - models.csv
+      - .github/workflows/check-models.yml
+      - .github/workflows/check-models.py
 
 jobs:
   check-general-csv-structure:

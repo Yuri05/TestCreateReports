@@ -2,8 +2,6 @@ name: Check links/cross-references in reports
 
 on: 
   pull_request:
-    branches:
-      - main
  
 jobs:
   find-modified-folders:

@@ -10,8 +10,10 @@ name: Validate qualifications.csv
 on:
   workflow_dispatch:
   push:
-#    branches:
-#      - main
+    paths:
+      - qualifications.csv
+      - .github/workflows/check-qualifications.yml
+      - .github/workflows/check-qualifications.py
 
 jobs:
   check-general-csv-structure:
