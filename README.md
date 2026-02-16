@@ -6,7 +6,8 @@
   - Go to the Github Action: [Create evaluation reports and projects](../../actions/workflows/create-evaluation_reports.yml)
     - Click on the button __Run workflow__ 
       - Select your branch defined in the first step (for instance, `my-reports`)
-      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request (s. [below](#next-step))
+      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request
+        (s. [below](#next-step))
       - Click on the green button __Run workflow__
         
         <img width="800" src="https://github.com/user-attachments/assets/863a98cd-ecff-43c5-8ed9-b1458becf48c" />
@@ -19,7 +20,8 @@
   - Go to the Github Action: [Qualification Reports](../../actions/workflows/create-qualification_reports.yml)
     - Click on the button __Run workflow__ 
       - Select your branch defined in the first step (for instance, `my-reports`)
-      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request (s. [below](#next-step))
+      - [OPTIONAL] Adjust the commit message which will appear later in the created pull request
+        (s. [below](#next-step))
       - Click on the green button __Run workflow__ 
 
 ## What to do when reports are created<a id="next-step"></a>
