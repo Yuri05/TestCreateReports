@@ -20,7 +20,6 @@
     - Click on the button __Run workflow__ 
       - Select your branch defined in the first step (for instance, `my-reports`)
       - [OPTIONAL] Adjust the commit message which will appear later in the created pull request<br>(s. the [What to do when reports are created](#next-step) section below).
-        (s. [below](#next-step))
       - Click on the green button __Run workflow__ 
 
 ## What to do when reports are created<a id="next-step"></a>
