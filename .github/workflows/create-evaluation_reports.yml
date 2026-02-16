@@ -91,7 +91,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v6
     
-    - name: Rebase from main
+    - name: Rebase from the base branch
       run: |
         git config --global core.longpaths true
         git config --global user.name 'github-actions'
@@ -207,11 +207,8 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v8
       with:
-        # Use a custom PAT because GITHUB_TOKEN cannot trigger subsequent workflows (here: required checks on pull_request).
-        # S. https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
-#        token: ${{ secrets.PAT_PR_TRIGGERED_BY_ACTIONS }}
         branch: ${{ matrix['Repository name'] }}-${{ github.run_number }}
-        base: main
+        base: ${{ github.ref_name }}
         commit-message: ${{ inputs.commit-message }}
         add-paths: |
             */images/**
@@ -225,4 +222,5 @@ jobs:
           ## All evaluated models
           ${{ needs.read_inputs.outputs.models_table }}
 #        reviewers: ${{ github.actor }}
+
 
