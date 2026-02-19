@@ -110,10 +110,10 @@ jobs:
 #        git commit -m "Update ${{ matrix['Folder name'] }}" || echo "No changes to commit"
 #      shell: bash
 
-    # Restore previously prepared environment if tools.csv was unchanged
-    - name: Restore setup cache
+    # Setup cache for the qualification environment
+    - name: Setup cache
       id: cache-setup
-      uses: actions/cache/restore@v5
+      uses: actions/cache@v5
       with:
         key: ospsuite-${{ hashFiles('tools.csv') }}
         path: |
@@ -158,17 +158,6 @@ jobs:
         Rscript -e 'remove.packages("ggplot2")'
         Rscript -e 'remotes::install_version("ggplot2", version = "3.5.2", repos = "https://cran.r-project.org")'
       shell: bash
-
-    # Save the prepared environment so subsequent runs can skip setup
-    - name: Save setup cache
-      if: steps.cache-setup.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
-      with:
-        key: ospsuite-${{ hashFiles('tools.csv') }}
-        path: |
-          ${{ env.R_LIBS_USER }}
-          ${{ github.workspace }}/PK-Sim
-          ${{ github.workspace }}/QualificationRunner
 
     - id: run-qualification
       name: Run qualification
